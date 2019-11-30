@@ -1,0 +1,103 @@
+/*Maximum XOR of Two Numbers in an Array
+ * Given an array of integers A, find and return the maximum result of A[i] XOR A[j], where i, j are the indexes of the array.
+ * 
+ * Input Format
+ * The only argument given is the integer array A.
+ * 
+ * Output Format
+ * Return the maximum result of A[i] XOR A[j].
+ * 
+ * Constraints
+ * 1 <= length of the array <= 100000
+ * 0 <= A[i] <= 10^9
+ * 
+ *  For Example
+ *  Input 1:
+ *      A = [1, 2, 3, 4, 5]
+ *  Output 1:
+ *      7
+ *  Input 2:
+ *      A = [5, 17, 100, 11]
+ *  Output 2:
+ *      117
+ */      
+import java.util.ArrayList;
+
+public class MaxXorTrie {
+	
+	public static void main(String[] args) {
+		MaxXorTrie sol = new MaxXorTrie();
+		ArrayList<Integer> list = new ArrayList<>();
+		list.add(5);
+		list.add(12);
+		list.add(15);
+		list.add(7);
+		System.out.println(sol.solve(list));
+	}
+	
+    public int solve(ArrayList<Integer> A) {
+        Trie root = new Trie();
+        int maxXor = 0;
+        int maxBits = 32; //for primitive int
+        for(int x: A) {
+            int t = getMaxXor(root, x, maxBits-1);
+            maxXor = Math.max(maxXor, t);
+            
+            insertIntoTrie(root, x);
+        }
+        return maxXor;
+    }
+    
+    int getMaxXor(Trie root, int x, int pos) {
+        int number = 0;
+        
+        for(int i=pos; i>=0; i--){
+            if((x & (1<<i))==0){
+                if(root.right!=null){
+                    number = number | (1<<i);
+                    root = root.right;
+                }else {
+                	if(root.left!=null)
+                		root = root.left;
+                }
+                
+            }else{
+            	if(root.left!=null) {
+            		number = number | (1<<i);
+            		root = root.left;
+            	}else {
+            		if(root.right!=null) {
+            			root = root.right;
+            		}
+                }
+            }
+        }
+        return number;
+    }
+    
+    void insertIntoTrie(Trie root, int x) {
+        int n = 31; //for primitive int
+        for(int i = n; i>=0; i--) {
+            int temp = (x & (1<<i));
+            if(temp!=0) {
+                if(root.right==null)
+                    root.right = new Trie();
+                root = root.right;
+            }else{
+                if(root.left==null)
+                    root.left = new Trie();
+                root = root.left;
+            }
+        }
+    }
+    
+    class Trie {
+        Trie left, right;
+        
+        Trie(){
+            left = null;
+            right = null;
+        }
+    }
+}
+
